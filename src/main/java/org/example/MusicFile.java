@@ -41,4 +41,12 @@ public class MusicFile {
     public String toString() {
         return name;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public File getPath() {
+        return path;
+    }
 }

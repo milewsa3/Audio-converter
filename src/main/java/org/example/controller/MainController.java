@@ -6,11 +6,14 @@ import com.jfoenix.controls.JFXListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ListCell;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.example.*;
@@ -34,7 +37,7 @@ public class MainController {
     private JFXButton startBt;
 
     @FXML
-    private JFXListView<String> trackForConversion;
+    private JFXListView<MusicFile> trackForConversion;
 
     @FXML
     private JFXButton addBt;
@@ -43,7 +46,7 @@ public class MainController {
     private JFXButton rmBt;
 
     @FXML
-    private JFXListView<String> resultOfConversion;
+    private JFXListView<MusicFile> resultOfConversion;
 
     @FXML
     private JFXButton saveToFileBt;
@@ -56,42 +59,21 @@ public class MainController {
     @FXML
     void chooseFolder(ActionEvent event) {
         File folder = getUserFolder();
-        System.out.println(folder);
+
         if(folder == null)
             return;
 
-
-        if(isTracksForConversionListViewEmpty()) {
-            addMusicFilesToLibrary(folder);
-            addTracksToListView();
+        if(!library.isEmpty() && isUserWantToOverrideTracks()) {
+            library.clear();
         }
-        else if(!isTracksForConversionListViewEmpty() && isUserWantToOverrideTracks()) {
-            clearTracksForConversion();
-            addMusicFilesToLibrary(folder);
-            addTracksToListView();
-        }
-    }
 
-    private void clearTracksForConversion() {
-        library.clear();
-        trackForConversion.getItems().clear();
-    }
+        addMusicFiles(folder);
 
-    private void addMusicFilesToLibrary(File folder) {
-        List<File> musicFiles = Searcher.searchForExtensions(folder, AudioFormat.WAV, true);
-        library.addAllSongs(musicFiles);
     }
 
     private File getUserFolder() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         return directoryChooser.showDialog(selectBt.getScene().getWindow());
-    }
-
-    private boolean isTracksForConversionListViewEmpty() {
-        ObservableList<String> olist = trackForConversion.getItems();
-        if(olist != null && olist.size() > 0)
-            return false;
-        return true;
     }
 
     private boolean isUserWantToOverrideTracks(){
@@ -104,10 +86,12 @@ public class MainController {
         return result.get() == ButtonType.OK;
     }
 
-    private void addTracksToListView() {
-        ObservableList<String> items = FXCollections.observableArrayList(library.getMusicFilesNames());
-        trackForConversion.setItems(items);
+
+    private void addMusicFiles(File folder) {
+        List<File> musicFiles = Searcher.searchForExtensions(folder, settings.getFrom(), settings.isRecursively());
+        library.addAllSongs(musicFiles);
     }
+
 
     @FXML
     void openSettings(ActionEvent event) throws IOException {
@@ -131,11 +115,43 @@ public class MainController {
 
     @FXML
     public void initialize() {
-//        List<String> tracks = new ArrayList<>();
-//        tracks.add("Track 1");
-//        tracks.add("Track 2");
-//        tracks.add("Track 3");
-//        ObservableList<String> items = FXCollections.observableArrayList(tracks);
-//        trackForConversion.setItems(items);
+        initTracksForConversionLV();
+    }
+
+    private void initTracksForConversionLV() {
+        trackForConversion.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(MusicFile musicFile, boolean empty) {
+                super.updateItem(musicFile, empty);
+
+                if(empty || musicFile == null || musicFile.getName() == null) {
+                    setText(null);
+                } else {
+                    setText(musicFile.getName());
+                }
+            }
+        });
+
+        trackForConversion.setItems(library.getMusicFiles());
+
+        trackForConversion.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(mouseEvent.getClickCount() == 2 && trackForConversion.getItems().size() > 0) {
+                    MusicFile currentItemSelected = trackForConversion.getSelectionModel().getSelectedItem();
+                    showFormatInformation(currentItemSelected);
+                }
+            }
+        });
+    }
+
+    private void showFormatInformation(MusicFile mf) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setResizable(true);
+        alert.setHeight(400f);
+        alert.setTitle("Music information");
+        alert.setHeaderText("Music file: " + mf.getName());
+        alert.setContentText(mf.getPath().toString());
+        alert.showAndWait();
     }
 }

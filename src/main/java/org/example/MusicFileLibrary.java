@@ -1,25 +1,23 @@
 package org.example;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class MusicFileLibrary {
-    private List<MusicFile> musicFiles;
+    private final ObservableList<MusicFile> musicFiles;
 
 
-    public MusicFileLibrary(List<File> musicFiles) {
-        this();
-
-        addAllSongs(musicFiles);
-    }
 
     public MusicFileLibrary() {
-        musicFiles = new ArrayList<>();
+        musicFiles = FXCollections.observableArrayList();
     }
 
-    public List<MusicFile> getMusicFiles() {
+    public ObservableList<MusicFile> getMusicFiles() {
         return musicFiles;
     }
 
@@ -34,7 +32,19 @@ public class MusicFileLibrary {
     }
 
     public void addSong(File musicFile) {
+        if(contains(musicFile))
+            return;
+
         musicFiles.add(new MusicFile(musicFile));
+    }
+
+    private boolean contains(File path) {
+        for(MusicFile mf : musicFiles) {
+            if(mf.getPath().compareTo(path) == 0)
+                return true;
+        }
+
+        return false;
     }
 
     public void addAllSongs(List<File> musicFiles) {
@@ -45,5 +55,9 @@ public class MusicFileLibrary {
 
     public void clear() {
         musicFiles.clear();
+    }
+
+    public boolean isEmpty() {
+        return musicFiles == null || musicFiles.size() == 0;
     }
 }
