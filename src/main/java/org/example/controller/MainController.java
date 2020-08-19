@@ -46,6 +46,9 @@ public class MainController {
     private JFXButton rmBt;
 
     @FXML
+    private JFXButton clearBt;
+
+    @FXML
     private JFXListView<MusicFile> resultOfConversion;
 
     @FXML
@@ -110,8 +113,8 @@ public class MainController {
     }
 
     @FXML
-    void addTrackForConv(ActionEvent event) {
-
+    void addTrackForConv(ActionEvent event) throws IOException {
+        App.openInNewWindowAndWait("add","Adding Window");
     }
 
     @FXML
@@ -129,6 +132,11 @@ public class MainController {
             library.remove(itemToRemove);
             trackForConversion.getSelectionModel().select(newSelectedIdx);
         }
+    }
+
+    @FXML
+    void clearTracksForConversionLV(ActionEvent event) {
+        library.clear();
     }
 
     @FXML

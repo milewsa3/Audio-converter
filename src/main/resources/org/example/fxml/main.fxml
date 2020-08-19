@@ -101,6 +101,7 @@
                      <children>
                         <JFXButton fx:id="addBt" buttonType="RAISED" onAction="#addTrackForConv" prefHeight="30.0" prefWidth="54.0" text="Add" />
                         <JFXButton fx:id="rmBt" onAction="#removeTrackForConv" prefHeight="26.0" prefWidth="72.0" text="Remove" />
+                        <JFXButton fx:id="clearBt" layoutX="177.0" layoutY="28.0" onAction="#clearTracksForConversionLV" prefHeight="26.0" prefWidth="72.0" text="Clear" />
                      </children>
                   </HBox>
                </children>
