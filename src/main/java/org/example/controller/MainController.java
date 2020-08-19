@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MainController {
-    private Settings settings = new Settings();
+    private Settings settings = Settings.getInstance();
     private MusicFileLibrary library = new MusicFileLibrary();
 
     @FXML
@@ -52,8 +52,8 @@ public class MainController {
     private JFXButton saveToFileBt;
 
     @FXML
-    void addTrackForConv(ActionEvent event) {
-
+    void openSettings(ActionEvent event) throws IOException {
+        App.openInNewWindowAndWait("settings","Configuration");
     }
 
     @FXML
@@ -62,6 +62,11 @@ public class MainController {
 
         if(folder == null)
             return;
+
+        if(!areSettingsSet()) {
+            showSetSettingsAlert();
+            return;
+        }
 
         if(!library.isEmpty() && isUserWantToOverrideTracks()) {
             library.clear();
@@ -74,6 +79,18 @@ public class MainController {
     private File getUserFolder() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         return directoryChooser.showDialog(selectBt.getScene().getWindow());
+    }
+
+    private boolean areSettingsSet() {
+        return settings.getFrom() != null && settings.getTo() != null;
+    }
+
+    private void showSetSettingsAlert() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Configuration error");
+        alert.setHeaderText("Configuration is not set");
+        alert.setContentText("Configuration must be set before choosing folder for search");
+        alert.showAndWait();
     }
 
     private boolean isUserWantToOverrideTracks(){
@@ -92,15 +109,26 @@ public class MainController {
         library.addAllSongs(musicFiles);
     }
 
-
     @FXML
-    void openSettings(ActionEvent event) throws IOException {
-        App.openSettings("settings",settings);
+    void addTrackForConv(ActionEvent event) {
+
     }
 
     @FXML
     void removeTrackForConv(ActionEvent event) {
 
+        final int selectedIdx = trackForConversion.getSelectionModel().getSelectedIndex();
+        if (selectedIdx != -1) {
+            MusicFile itemToRemove = trackForConversion.getSelectionModel().getSelectedItem();
+
+            final int newSelectedIdx =
+                    (selectedIdx == trackForConversion.getItems().size() - 1)
+                            ? selectedIdx - 1
+                            : selectedIdx;
+
+            library.remove(itemToRemove);
+            trackForConversion.getSelectionModel().select(newSelectedIdx);
+        }
     }
 
     @FXML
@@ -110,7 +138,21 @@ public class MainController {
 
     @FXML
     void startConversion(ActionEvent event) {
+        boolean result = showConfirmationAlert();
+        if(!result)
+            return;
 
+        System.out.println("START");
+    }
+
+    private boolean showConfirmationAlert() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Are you sure?");
+        alert.setContentText("You won't be able to undo this action!");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.get() == ButtonType.OK;
     }
 
     @FXML

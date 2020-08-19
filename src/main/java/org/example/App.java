@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.controller.SettingsController;
@@ -21,6 +22,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("main"));
         stage.setScene(scene);
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("assets/wave.png")));
         stage.setTitle("Audio converter");
         stage.show();
     }
@@ -34,17 +36,15 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void openSettings(String fxml, Settings settings) throws IOException{
+    public static void openInNewWindowAndWait(String fxml, String title) throws IOException{
         FXMLLoader loader = new FXMLLoader(App.class.getResource("fxml/" + fxml + ".fxml"));
         Parent root = loader.load();
-
-        SettingsController settingsController = loader.getController();
-        settingsController.setSettings(settings);
 
         Stage stage = new Stage();
 
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle("Configuration");
+        stage.setResizable(false);
+        stage.setTitle(title);
         stage.setScene(new Scene(root));
         stage.showAndWait();
     }

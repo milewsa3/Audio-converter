@@ -1,28 +1,28 @@
 package org.example.controller;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import org.example.AudioFormat;
 import org.example.Settings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SettingsController {
-    private Settings settings;
+    private Settings settings = Settings.getInstance();
 
     @FXML
-    private JFXComboBox<String> fromComboBox;
+    private JFXComboBox<AudioFormat> fromComboBox;
 
     @FXML
-    private JFXComboBox<String> toComboBox;
+    private JFXComboBox<AudioFormat> toComboBox;
 
     @FXML
     private JFXCheckBox recursionCB;
@@ -35,72 +35,33 @@ public class SettingsController {
 
     @FXML
     void ommitRepetition(ActionEvent event) {
-
     }
 
     @FXML
     void recursionPressed(ActionEvent event) {
-
     }
 
     @FXML
     void apply(ActionEvent event) {
-
+        settings.setFrom(fromComboBox.getSelectionModel().getSelectedItem());
+        settings.setTo(toComboBox.getSelectionModel().getSelectedItem());
+        settings.setRecursively(recursionCB.isSelected());
+        settings.setOmitRepeatingTracks(ommitReapetitionCB.isSelected());
     }
 
     @FXML
     public void initialize() {
-        Platform.runLater(this::init);
+        ObservableList<AudioFormat> allFormats = FXCollections.observableArrayList(AudioFormat.values());
+        allFormats.remove(AudioFormat.ERROR);
 
-    }
+        fromComboBox.setItems(allFormats);
+        toComboBox.setItems(allFormats);
 
-    private void init() {
-        addAudioFormatsToOptions();
-        readSettingsClass();
-    }
+        fromComboBox.getSelectionModel().select(settings.getFrom());
+        toComboBox.getSelectionModel().select(settings.getTo());
 
-    private void readSettingsClass() {
-        readFromFormat();
-        readToFormat();
-    }
-
-    private void readFromFormat() {
-        ObservableList<String> ol = fromComboBox.getItems();
-        for(String s : ol) {
-            if(s.compareTo(settings.getFrom().toString()) == 0) {
-                System.out.println(s);
-            }
-        }
-        fromComboBox.getSelectionModel().select(settings.getFrom().getName());
-    }
-
-    private void readToFormat() {
-        ObservableList<String> ol = toComboBox.getItems();
-        for(String s : ol) {
-            if(s.compareTo(settings.getTo().toString()) == 0) {
-                System.out.println(s);
-            }
-        }
-        toComboBox.getSelectionModel().select(settings.getTo().getName());
-    }
-
-    private List<String> getAllAudioFormats(){
-        List<String> allAudioFormats = new ArrayList<>();
-        for(AudioFormat af : AudioFormat.values())
-            allAudioFormats.add(af.getName());
-
-        return allAudioFormats;
-    }
-
-    private void addAudioFormatsToOptions() {
-        ObservableList<String> optionsFrom = FXCollections.observableArrayList(getAllAudioFormats());
-        ObservableList<String> optionsTo = FXCollections.observableArrayList(getAllAudioFormats());
-        fromComboBox.setItems(optionsFrom);
-        toComboBox.setItems(optionsTo);
-    }
-
-    public void setSettings(Settings settings) {
-        this.settings = settings;
+        recursionCB.setSelected(settings.isRecursively());
+        ommitReapetitionCB.setSelected(settings.isOmitRepeatingTracks());
     }
 }
 

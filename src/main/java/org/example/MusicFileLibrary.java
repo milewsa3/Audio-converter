@@ -60,4 +60,8 @@ public class MusicFileLibrary {
     public boolean isEmpty() {
         return musicFiles == null || musicFiles.size() == 0;
     }
+
+    public boolean remove(MusicFile itemToRemove) {
+        return musicFiles.remove(itemToRemove);
+    }
 }

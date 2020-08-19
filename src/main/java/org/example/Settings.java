@@ -1,17 +1,22 @@
 package org.example;
 
+//Singleton design pattern has been used
 public class Settings {
+    private static final Settings instance = new Settings();
+
     private AudioFormat from;
     private AudioFormat to;
     private boolean recursively;
     private boolean omitRepeatingTracks;
 
-    public Settings() {
-        //default options
-        from = AudioFormat.FLAC;
-        to = AudioFormat.MP3;
+    private Settings() {
+        //default options;
         recursively = true;
         omitRepeatingTracks = true;
+    }
+
+    public static Settings getInstance() {
+        return instance;
     }
 
     public AudioFormat getFrom() {

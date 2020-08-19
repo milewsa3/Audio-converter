@@ -3,9 +3,9 @@ package org.example;
 import java.io.File;
 
 public class MusicFile {
-    private File path;
     private String name;
     private AudioFormat audioFormat;
+    private File path;
 
     public MusicFile(File path) {
         if(!path.exists() || path.isDirectory())
@@ -17,29 +17,32 @@ public class MusicFile {
         extractFormat();
     }
 
-    private void extractFormat() {
-        String filePath = path.getName();
-        String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
-        audioFormat = parseExtension(extension);
-    }
-
-    private AudioFormat parseExtension(String extension) {
-        for(AudioFormat af : AudioFormat.values()) {
-            if(af.getName().compareTo(extension) == 0)
-                return af;
-        }
-
-        throw new IllegalArgumentException("Wrong extension of the file");
-    }
-
     private void extractName() {
         String nameWithExtension = path.getName();
         name = nameWithExtension.substring(0,nameWithExtension.lastIndexOf('.'));
     }
 
+    private void extractFormat() {
+        String filePath = path.getName();
+        String format = filePath.substring(filePath.lastIndexOf(".") + 1);
+        audioFormat = parseFormat(format);
+    }
+
+    private AudioFormat parseFormat(String format) {
+        AudioFormat af;
+        try {
+            af = AudioFormat.valueOf(format.toUpperCase());
+        } catch (IllegalArgumentException exc) {
+            af = AudioFormat.ERROR;
+        }
+
+        return af;
+    }
+
+
     @Override
     public String toString() {
-        return name;
+        return "Music file: " + name;
     }
 
     public String getName() {
@@ -48,5 +51,9 @@ public class MusicFile {
 
     public File getPath() {
         return path;
+    }
+
+    public AudioFormat getAudioFormat() {
+        return audioFormat;
     }
 }
