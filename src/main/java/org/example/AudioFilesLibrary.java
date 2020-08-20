@@ -7,25 +7,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-public class MusicFileLibrary implements Iterable<MusicFile>{
-    private final ObservableList<MusicFile> musicFiles;
-
+public class AudioFilesLibrary implements Iterable<AudioFile>{
+    private final ObservableList<AudioFile> audioFiles;
 
 
-    public MusicFileLibrary() {
-        musicFiles = FXCollections.observableArrayList();
+
+    public AudioFilesLibrary() {
+        audioFiles = FXCollections.observableArrayList();
     }
 
-    public ObservableList<MusicFile> getMusicFiles() {
-        return musicFiles;
+    public ObservableList<AudioFile> getMusicFiles() {
+        return audioFiles;
     }
 
     public List<String> getMusicFilesNames() {
         List<String> list = new ArrayList<>();
 
-        for(MusicFile mf : musicFiles) {
+        for(AudioFile mf : audioFiles) {
             list.add(mf.toString());
         }
 
@@ -36,11 +35,11 @@ public class MusicFileLibrary implements Iterable<MusicFile>{
         if(contains(musicFile))
             return;
 
-        musicFiles.add(new MusicFile(musicFile));
+        audioFiles.add(new AudioFile(musicFile));
     }
 
     public boolean contains(File path) {
-        for(MusicFile mf : musicFiles) {
+        for(AudioFile mf : audioFiles) {
             if(mf.getFile().compareTo(path) == 0)
                 return true;
         }
@@ -55,19 +54,19 @@ public class MusicFileLibrary implements Iterable<MusicFile>{
     }
 
     public void clear() {
-        musicFiles.clear();
+        audioFiles.clear();
     }
 
     public boolean isEmpty() {
-        return musicFiles == null || musicFiles.size() == 0;
+        return audioFiles == null || audioFiles.size() == 0;
     }
 
-    public boolean remove(MusicFile itemToRemove) {
-        return musicFiles.remove(itemToRemove);
+    public boolean remove(AudioFile itemToRemove) {
+        return audioFiles.remove(itemToRemove);
     }
 
     @Override
-    public Iterator<MusicFile> iterator() {
-        return musicFiles.iterator();
+    public Iterator<AudioFile> iterator() {
+        return audioFiles.iterator();
     }
 }

@@ -3,30 +3,25 @@ package org.example.controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.example.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 public class MainController {
     private Settings settings = Settings.getInstance();
-    private MusicFileLibrary library = new MusicFileLibrary();
+    private AudioFilesLibrary library = new AudioFilesLibrary();
+    private AudioFilesLibrary convertedFiles = new AudioFilesLibrary();
 
     @FXML
     private JFXButton settingsBt;
@@ -38,7 +33,7 @@ public class MainController {
     private JFXButton startBt;
 
     @FXML
-    private JFXListView<MusicFile> trackForConversion;
+    private JFXListView<AudioFile> trackForConversion;
 
     @FXML
     private JFXButton addBt;
@@ -50,7 +45,7 @@ public class MainController {
     private JFXButton clearBt;
 
     @FXML
-    private JFXListView<MusicFile> resultOfConversion;
+    private JFXListView<AudioFile> resultOfConversion;
 
     @FXML
     private JFXButton saveToFileBt;
@@ -91,7 +86,8 @@ public class MainController {
 
 
     private void addMusicFiles(File folder) {
-        List<File> musicFiles = Searcher.searchForExtensions(folder, settings.getFrom(), settings.isRecursively());
+        Finder finder = new SimpleFinder();
+        List<File> musicFiles = finder.searchWithExtension(settings.getFrom(), folder, settings.isRecursively());
         if(musicFiles.size() == 0)
             AlertPrinter.showNoSuchFormatAlert(settings.getFrom());
         library.addAllSongs(musicFiles);
@@ -122,7 +118,7 @@ public class MainController {
 
         final int selectedIdx = trackForConversion.getSelectionModel().getSelectedIndex();
         if (selectedIdx != -1) {
-            MusicFile itemToRemove = trackForConversion.getSelectionModel().getSelectedItem();
+            AudioFile itemToRemove = trackForConversion.getSelectionModel().getSelectedItem();
 
             final int newSelectedIdx =
                     (selectedIdx == trackForConversion.getItems().size() - 1)
@@ -155,7 +151,12 @@ public class MainController {
         }
 
         System.out.println("START");
-        new Converter(library,settings.getFrom(),settings.getTo()).convert();
+        Platform.runLater(() -> {
+            new SimpleConverter(library,settings.getFrom(),settings.getTo()).convert();
+            System.out.println("END");
+        });
+
+        //new SimpleConverter(library,settings.getFrom(),settings.getTo()).convert();
     }
 
     @FXML
@@ -166,13 +167,13 @@ public class MainController {
     private void initTracksForConversionLV() {
         trackForConversion.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(MusicFile musicFile, boolean empty) {
-                super.updateItem(musicFile, empty);
+            protected void updateItem(AudioFile audioFile, boolean empty) {
+                super.updateItem(audioFile, empty);
 
-                if(empty || musicFile == null || musicFile.getName() == null) {
+                if(empty || audioFile == null || audioFile.getName() == null) {
                     setText(null);
                 } else {
-                    setText(musicFile.getName());
+                    setText(audioFile.getName());
                 }
             }
         });
@@ -183,8 +184,8 @@ public class MainController {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if(mouseEvent.getClickCount() == 2 && trackForConversion.getItems().size() > 0) {
-                    MusicFile currentItemSelected = trackForConversion.getSelectionModel().getSelectedItem();
-                    AlertPrinter.showFormatInformation(currentItemSelected);
+                    AudioFile currentItemSelected = trackForConversion.getSelectionModel().getSelectedItem();
+                    AlertPrinter.showAudioInformation(currentItemSelected);
                 }
             }
         });

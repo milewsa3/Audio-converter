@@ -1,11 +1,16 @@
 package org.example;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Searcher {
-    public static List<File> searchForExtensions(File folder, AudioFormat format, boolean recursively) {
+public class SimpleFinder implements Finder{
+
+    @Override
+    public List<File> searchWithExtension(AudioFormat format, File folder, boolean recursively) {
         List<File> files = new ArrayList<>();
         if (!folder.exists())
             throw new RuntimeException("Wrong path");
@@ -14,7 +19,7 @@ public class Searcher {
             File[] inside = folder.listFiles();
             for (File f : inside) {
                 if(f.isDirectory())
-                    files.addAll(searchForExtensions(f,format, true));
+                    files.addAll(searchWithExtension(format,f ,true));
                 else {
                     if(f.toString().endsWith("." + format.getName()))
                         files.add(f);
@@ -27,5 +32,10 @@ public class Searcher {
         }
 
         return files;
+    }
+
+    @Override
+    public File searchForFile(File file) {
+        return null;
     }
 }

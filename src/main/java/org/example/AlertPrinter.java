@@ -3,6 +3,7 @@ package org.example;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AlertPrinter {
@@ -43,13 +44,13 @@ public class AlertPrinter {
         return result.get() == ButtonType.OK;
     }
 
-    public static void showFormatInformation(MusicFile mf) {
+    public static void showAudioInformation(AudioFile af) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setResizable(true);
         alert.setHeight(400f);
         alert.setTitle("Music information");
-        alert.setHeaderText("Music file: " + mf.getName());
-        alert.setContentText(mf.getFile().toString());
+        alert.setHeaderText("Information about audio file");
+        alert.setContentText(af.toString());
         alert.showAndWait();
     }
 
@@ -58,6 +59,17 @@ public class AlertPrinter {
         alert.setTitle("Conversion error");
         alert.setHeaderText("No files for conversion");
         alert.setContentText("First, you have to add tracks for conversion");
+        alert.showAndWait();
+    }
+
+    public static void showAlreadyConvertedFiles(List<AudioFile> audioFiles) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Conversion info");
+        alert.setHeaderText("These files are already converted");
+        StringBuilder sb = new StringBuilder();
+        for(AudioFile af : audioFiles)
+            sb.append(af).append("\n\n");
+        alert.setContentText(sb.toString());
         alert.showAndWait();
     }
 }

@@ -2,28 +2,28 @@ package org.example;
 
 import java.io.File;
 
-public class MusicFile {
+public class AudioFile {
     private String name;
     private AudioFormat audioFormat;
-    private File path;
+    private File file;
 
-    public MusicFile(File path) {
+    public AudioFile(File path) {
         if(!path.exists() || path.isDirectory())
             throw new IllegalArgumentException("Wrong path of the song");
 
-        this.path = path;
+        this.file = path;
 
         extractName();
         extractFormat();
     }
 
     private void extractName() {
-        String nameWithExtension = path.getName();
+        String nameWithExtension = file.getName();
         name = nameWithExtension.substring(0,nameWithExtension.lastIndexOf('.'));
     }
 
     private void extractFormat() {
-        String filePath = path.getName();
+        String filePath = file.getName();
         String format = filePath.substring(filePath.lastIndexOf(".") + 1);
         audioFormat = parseFormat(format);
     }
@@ -42,7 +42,8 @@ public class MusicFile {
 
     @Override
     public String toString() {
-        return "Music file: " + name;
+        return "Music file: " + name +
+                "\nPath: " + file;
     }
 
     public String getName() {
@@ -50,7 +51,14 @@ public class MusicFile {
     }
 
     public File getFile() {
-        return path;
+        return file;
+    }
+
+    public File generateFileWithAnotherExtension(AudioFormat af) {
+        if(af == audioFormat)
+            throw new IllegalArgumentException("Current file have already desired format: " + af);
+
+        return new File(file.getParent() + "\\" + name + "." + af.getName());
     }
 
     public AudioFormat getAudioFormat() {
