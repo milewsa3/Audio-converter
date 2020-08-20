@@ -49,7 +49,7 @@ public class MusicFile {
         return name;
     }
 
-    public File getPath() {
+    public File getFile() {
         return path;
     }
 

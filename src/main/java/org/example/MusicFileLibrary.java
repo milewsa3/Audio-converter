@@ -5,10 +5,11 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class MusicFileLibrary {
+public class MusicFileLibrary implements Iterable<MusicFile>{
     private final ObservableList<MusicFile> musicFiles;
 
 
@@ -40,7 +41,7 @@ public class MusicFileLibrary {
 
     public boolean contains(File path) {
         for(MusicFile mf : musicFiles) {
-            if(mf.getPath().compareTo(path) == 0)
+            if(mf.getFile().compareTo(path) == 0)
                 return true;
         }
 
@@ -63,5 +64,10 @@ public class MusicFileLibrary {
 
     public boolean remove(MusicFile itemToRemove) {
         return musicFiles.remove(itemToRemove);
+    }
+
+    @Override
+    public Iterator<MusicFile> iterator() {
+        return musicFiles.iterator();
     }
 }

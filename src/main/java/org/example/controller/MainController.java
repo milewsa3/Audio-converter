@@ -68,11 +68,11 @@ public class MainController {
             return;
 
         if(!areSettingsSet()) {
-            showSetSettingsAlert();
+            AlertPrinter.showSetSettingsAlert();
             return;
         }
 
-        if(!library.isEmpty() && isUserWantToOverrideTracks()) {
+        if(!library.isEmpty() && AlertPrinter.isUserWantToOverrideTracks()) {
             library.clear();
         }
 
@@ -89,34 +89,18 @@ public class MainController {
         return settings.getFrom() != null && settings.getTo() != null;
     }
 
-    private void showSetSettingsAlert() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Configuration error");
-        alert.setHeaderText("Configuration is not set");
-        alert.setContentText("Configuration must be set before searching");
-        alert.showAndWait();
-    }
-
-    private boolean isUserWantToOverrideTracks(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("List is not empty");
-        alert.setContentText("You have already added some tracks for conversion. \nDo you want to override them?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get() == ButtonType.OK;
-    }
-
 
     private void addMusicFiles(File folder) {
         List<File> musicFiles = Searcher.searchForExtensions(folder, settings.getFrom(), settings.isRecursively());
+        if(musicFiles.size() == 0)
+            AlertPrinter.showNoSuchFormatAlert(settings.getFrom());
         library.addAllSongs(musicFiles);
     }
 
     @FXML
     void addTrackForConv(ActionEvent event) throws IOException {
         if(!areSettingsSet()) {
-            showSetSettingsAlert();
+            AlertPrinter.showSetSettingsAlert();
             return;
         }
 
@@ -162,21 +146,16 @@ public class MainController {
 
     @FXML
     void startConversion(ActionEvent event) {
-        boolean result = showConfirmationAlert();
+        boolean result = AlertPrinter.showConfirmationAlert();
         if(!result)
             return;
+        if(library.isEmpty()) {
+            AlertPrinter.showNoFilesForConversionAlert();
+            return;
+        }
 
         System.out.println("START");
-    }
-
-    private boolean showConfirmationAlert() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Are you sure?");
-        alert.setContentText("You won't be able to undo this action!");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.get() == ButtonType.OK;
+        new Converter(library,settings.getFrom(),settings.getTo()).convert();
     }
 
     @FXML
@@ -205,19 +184,9 @@ public class MainController {
             public void handle(MouseEvent mouseEvent) {
                 if(mouseEvent.getClickCount() == 2 && trackForConversion.getItems().size() > 0) {
                     MusicFile currentItemSelected = trackForConversion.getSelectionModel().getSelectedItem();
-                    showFormatInformation(currentItemSelected);
+                    AlertPrinter.showFormatInformation(currentItemSelected);
                 }
             }
         });
-    }
-
-    private void showFormatInformation(MusicFile mf) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setResizable(true);
-        alert.setHeight(400f);
-        alert.setTitle("Music information");
-        alert.setHeaderText("Music file: " + mf.getName());
-        alert.setContentText(mf.getPath().toString());
-        alert.showAndWait();
     }
 }
