@@ -38,7 +38,7 @@ public class MusicFileLibrary {
         musicFiles.add(new MusicFile(musicFile));
     }
 
-    private boolean contains(File path) {
+    public boolean contains(File path) {
         for(MusicFile mf : musicFiles) {
             if(mf.getPath().compareTo(path) == 0)
                 return true;

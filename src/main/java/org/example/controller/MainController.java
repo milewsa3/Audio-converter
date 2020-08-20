@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.*;
 
@@ -92,7 +93,7 @@ public class MainController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Configuration error");
         alert.setHeaderText("Configuration is not set");
-        alert.setContentText("Configuration must be set before choosing folder for search");
+        alert.setContentText("Configuration must be set before searching");
         alert.showAndWait();
     }
 
@@ -114,7 +115,22 @@ public class MainController {
 
     @FXML
     void addTrackForConv(ActionEvent event) throws IOException {
-        App.openInNewWindowAndWait("add","Adding Window");
+        if(!areSettingsSet()) {
+            showSetSettingsAlert();
+            return;
+        }
+
+        File musicFile = getUserFile();
+        if(musicFile == null)
+            return;
+
+        library.addSong(musicFile);
+    }
+
+    private File getUserFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Music Files", "*." + settings.getFrom().getName()));
+        return fileChooser.showOpenDialog(addBt.getScene().getWindow());
     }
 
     @FXML

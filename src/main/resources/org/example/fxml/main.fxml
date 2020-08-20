@@ -94,10 +94,10 @@
                   </Label>
                   <JFXScrollPane VBox.vgrow="ALWAYS">
                      <children>
-                        <JFXListView fx:id="trackForConversion" prefHeight="242.0" prefWidth="196.0" showTooltip="true" />
+                        <JFXListView fx:id="trackForConversion" showTooltip="true" />
                      </children>
                   </JFXScrollPane>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="321.0" spacing="30.0">
                      <children>
                         <JFXButton fx:id="addBt" buttonType="RAISED" onAction="#addTrackForConv" prefHeight="30.0" prefWidth="54.0" text="Add" />
                         <JFXButton fx:id="rmBt" onAction="#removeTrackForConv" prefHeight="26.0" prefWidth="72.0" text="Remove" />
