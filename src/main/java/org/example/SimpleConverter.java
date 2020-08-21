@@ -15,9 +15,9 @@ public class SimpleConverter implements Converter{
     private AudioFormat fromFormat;
     private AudioFormat toFormat;
 
-    public SimpleConverter(AudioFilesLibrary fromLibrary, AudioFormat fromFormat, AudioFormat toFormat) {
+    public SimpleConverter(AudioFilesLibrary fromLibrary, AudioFilesLibrary toLibrary, AudioFormat fromFormat, AudioFormat toFormat) {
         this.fromLibrary = fromLibrary;
-        toLibrary = new AudioFilesLibrary();
+        this.toLibrary = toLibrary;
         this.fromFormat = fromFormat;
         this.toFormat = toFormat;
     }
@@ -26,8 +26,11 @@ public class SimpleConverter implements Converter{
         List<AudioFile> alreadyConvertedFiles = new ArrayList<>();
 
         for(AudioFile af : fromLibrary) {
-            if(!wasConverted(af))
-                convertSingleFile(af.getFile(),af.generateFileWithAnotherExtension(toFormat));
+            if(!wasConverted(af)) {
+                boolean wasSuccessful = convertSingleFile(af.getFile(), af.generateFileWithAnotherExtension(toFormat));
+                if(wasSuccessful)
+                    toLibrary.addSong(af.generateFileWithAnotherExtension(toFormat));
+            }
             else
                 alreadyConvertedFiles.add(af);
         }
@@ -69,5 +72,9 @@ public class SimpleConverter implements Converter{
         }
 
         return true;
+    }
+
+    public AudioFilesLibrary getToLibrary() {
+        return toLibrary;
     }
 }

@@ -2,8 +2,10 @@ package org.example.controller;
 
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -152,7 +154,7 @@ public class MainController {
 
         System.out.println("START");
         Platform.runLater(() -> {
-            new SimpleConverter(library,settings.getFrom(),settings.getTo()).convert();
+            new SimpleConverter(library,convertedFiles,settings.getFrom(),settings.getTo()).convert();
             System.out.println("END");
         });
 
@@ -161,30 +163,39 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        initTracksForConversionLV();
+        initLV(trackForConversion,library);
+        initLV(resultOfConversion,convertedFiles);
+
+        //when files are in the lv, you cant edit configuration
+        library.getMusicFiles().addListener(new ListChangeListener<AudioFile>() {
+            @Override
+            public void onChanged(Change<? extends AudioFile> change) {
+                settingsBt.setDisable(change.getList().size() > 0);
+            }
+        });
     }
 
-    private void initTracksForConversionLV() {
-        trackForConversion.setCellFactory(param -> new ListCell<>() {
+    private void initLV(JFXListView<AudioFile> listView, AudioFilesLibrary library) {
+        listView.setCellFactory(param -> new JFXListCell<>() {
             @Override
-            protected void updateItem(AudioFile audioFile, boolean empty) {
-                super.updateItem(audioFile, empty);
+            protected void updateItem(AudioFile item, boolean empty) {
+                super.updateItem(item, empty);
 
-                if(empty || audioFile == null || audioFile.getName() == null) {
+                if(empty || item == null || item.getName() == null) {
                     setText(null);
                 } else {
-                    setText(audioFile.getName());
+                    setText(item.getName());
                 }
             }
         });
 
-        trackForConversion.setItems(library.getMusicFiles());
+        listView.setItems(library.getMusicFiles());
 
-        trackForConversion.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(mouseEvent.getClickCount() == 2 && trackForConversion.getItems().size() > 0) {
-                    AudioFile currentItemSelected = trackForConversion.getSelectionModel().getSelectedItem();
+                if(mouseEvent.getClickCount() == 2 && listView.getItems().size() > 0) {
+                    AudioFile currentItemSelected = listView.getSelectionModel().getSelectedItem();
                     AlertPrinter.showAudioInformation(currentItemSelected);
                 }
             }
